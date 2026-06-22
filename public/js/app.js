@@ -418,33 +418,24 @@ function initMembershipModal() {
       plan: document.getElementById('memberPlan').value
     };
 
-    try {
-      let result;
-      try {
-        const response = await fetch('/api/membership', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        result = await response.json();
-      } catch {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        result = { success: true, message: `Thank you for choosing the ${data.plan} plan! Our team will contact you shortly.` };
-      }
+    // Format the message for WhatsApp
+    const gymPhone = '919964582171'; // Mega Gym's phone number with country code
+    const text = `Hi Mega Gym! 🏋️‍♂️\n\nI would like to book the *${data.plan}* plan.\n\n*My Details:*\nName: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\n\nCould you please give me more information and let me know the next steps?`;
+    
+    const whatsappUrl = `https://wa.me/${gymPhone}?text=${encodeURIComponent(text)}`;
 
-      if (result.success) {
-        status.textContent = result.message;
-        status.className = 'form-status success';
-        form.reset();
-        showToast('Membership inquiry submitted! 🏋️');
-        setTimeout(() => modal.classList.remove('active'), 2500);
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      status.textContent = error.message || 'Something went wrong. Please try again.';
-      status.className = 'form-status error';
-    }
+    // Show success message
+    status.textContent = "Redirecting to WhatsApp...";
+    status.className = 'form-status success';
+    
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
+
+    // Clean up
+    setTimeout(() => {
+      form.reset();
+      modal.classList.remove('active');
+    }, 1500);
   });
 }
 
